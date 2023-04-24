@@ -151,6 +151,15 @@ phy_start_offset	.req x23
 	.endm
 
 FUNC _start , :
+#ifdef CFG_WITH_VIRTUAL_TEE_RAM_START
+       /* Disable I and D cache */
+       mrs     x4, sctlr_el1
+       bic     x4, x4, #SCTLR_I
+       bic     x4, x4, #SCTLR_C
+       msr     sctlr_el1, x4
+       isb
+#endif /* CFG_WITH_VIRTUAL_TEE_RAM_START */
+
 #if defined(CFG_CORE_SEL1_SPMC)
 	/*
 	 * With OP-TEE as SPMC at S-EL1 the SPMD (SPD_spmd) in TF-A passes
@@ -178,6 +187,17 @@ FUNC _start , :
 
 	set_sctlr_el1
 	isb
+#ifdef CFG_WITH_VIRTUAL_TEE_RAM_START
+      /* As set_sctlr_el1 macro is enabling I cache, so disabling
+       * I cache again here.
+       * set_sctlr_el1 macro is also used by other functions, so it
+       * is better to not make modification in set_sctlr_el1 macro.
+       */
+       mrs     x0, sctlr_el1
+       bic     x0, x0, #SCTLR_I
+       msr     sctlr_el1, x0
+       isb
+#endif /* CFG_WITH_VIRTUAL_TEE_RAM_START */
 
 #ifdef CFG_WITH_PAGER
 	/*
@@ -739,13 +759,6 @@ LOCAL_FUNC enable_mmu_early , : , .identity_map
 
 	/* Invalidate instruction cache and branch predictor */
 	ic	iallu
-	isb
-
-	/* Enable I and D cache */
-	mrs	x1, sctlr_el1
-	orr	x1, x1, #SCTLR_I
-	orr	x1, x1, #SCTLR_C
-	msr	sctlr_el1, x1
 	isb
 
 	/* Adjust return address */

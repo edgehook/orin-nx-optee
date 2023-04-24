@@ -1371,7 +1371,9 @@ void __weak core_init_mmu_map(unsigned long seed, struct core_mmu_config *cfg, l
 	struct tee_mmap_region *tmp_mmap = get_tmp_mmap();
 	unsigned long offs = 0;
 
+#ifdef CFG_WITH_VIRTUAL_TEE_RAM_START
 	phy_tee_ram_offset = offset;
+#endif
 
 	fixup_sec_mem_config(offset);
 	check_sec_nsec_mem_config();

@@ -6,7 +6,7 @@
 include core/arch/arm/cpu/cortex-armv8-0.mk
 
 # TZDRAM and SHMEM addresses and sizes
-CFG_TZDRAM_START ?= 0x80000000
+CFG_TZDRAM_START ?= 0x43c040000
 
 # Use dynamic shared memory and disable static shared memory because
 # the NS shared memory address and size are calculated dynamically
@@ -31,7 +31,7 @@ $(call force,CFG_WITH_LPAE,y)
 # Virtual TEE RAM start address is required for Tegra platforms
 ifeq ($(CFG_WITH_LPAE),y)
 CFG_LPAE_ADDR_SPACE_BITS = 38
-$(call force,CFG_WITH_VIRTUAL_TEE_RAM_START,y)
+$(call force,CFG_WITH_VIRTUAL_TEE_RAM_START,n)
 $(call force,CFG_WITH_PAGER,n)
 CFG_EARLY_UART_BASE = 0x0c198000
 CFG_EARLY_UART_SIZE = 0x00001000
